@@ -7,14 +7,10 @@ on:
         required: true
         default: ''
         type: string
-      rancher_ref:
-        description: "Submit PR against the following rancher/rancher branch (e.g. release/v2.7)"
-        default: "release/v2.8"
-        type: string
       operator_commit:
-        description: "Operator commit to use for updating rancher/rancher"
+        description: "Operator commit to use when building the image and chart"
         required: true
-        default: ""
+        default: ''
         type: string
 jobs:
   set_build_date:
@@ -38,25 +34,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+            repository: rancher/${{ inputs.operator_name }}
             fetch-depth: 0
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push image
-        uses: docker/build-push-action@v6
+            ref: ${{ inputs.operator_commit }}
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          context: .
-          tags: ${{ env.OPERATOR_IMAGE_REPO_BASE}}-${{ env.BUILD_DATE }}:${{ env.TAG }}
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          target: ${{ inputs.operator_name }}
-          file: test/e2e/Dockerfile.e2e
-          build-args: |
-            TAG=${{ env.TAG }}
-            REPO=${{ env.OPERATOR_IMAGE_REPO_BASE }}-${{ env.BUILD_DATE }}
-            COMMIT=${{ github.sha }}
+          go-version-file: 'go.mod'
+          check-latest: true
+      - name: Build and push image
+        env:
+          REPO: ${{ env.OPERATOR_IMAGE_REPO_BASE }}-${{ env.BUILD_DATE }} # ttl.sh/aks-operator-nightly-20241125:1d
+        run: |
+          make operator
+          make image-push
       - name: Set outputs
         id: setoutputs
         run: |
@@ -77,7 +68,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: rancher/${{ inputs.operator_name }}
-          ref: main
+          ref: ${{ inputs.operator_commit }}
           path: ${{ inputs.operator_name }}
       - name: Install Helm
         uses: azure/setup-helm@v4
