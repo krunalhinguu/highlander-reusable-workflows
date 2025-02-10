@@ -87,12 +87,12 @@ jobs:
           helm push bin/rancher-${{ inputs.operator_name }}-crd-${{ env.BUILD_DATE }}.tgz ${{ env.OPERATOR_HELM_REPO }}
           helm push bin/rancher-${{ inputs.operator_name }}-${{ env.BUILD_DATE }}.tgz ${{ env.OPERATOR_HELM_REPO }}
       - name: Upload operator helm chart as artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: rancher-${{ inputs.operator_name }}-${{ env.BUILD_DATE }}.tgz 
           path: ${{ inputs.operator_name }}/bin/rancher-${{ inputs.operator_name }}-${{ env.BUILD_DATE }}.tgz 
       - name: Upload CRD helm chart as artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: rancher-${{ inputs.operator_name }}-crd-${{ env.BUILD_DATE }}.tgz
           path: ${{ inputs.operator_name }}/bin/rancher-${{ inputs.operator_name }}-crd-${{ env.BUILD_DATE }}.tgz 

@@ -77,7 +77,7 @@ jobs:
         if: ${{ inputs.rancher_helm_repo != '' }}
         run: helm push charts/rancher-${{ env.RANCHER_IMAGE_TAG }}.tgz ${{ inputs.rancher_helm_repo }}
       - name: Upload rancher helm chart as artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: rancher-${{ env.RANCHER_IMAGE_TAG }}.tgz
           path: charts/rancher-${{ env.RANCHER_IMAGE_TAG }}.tgz
